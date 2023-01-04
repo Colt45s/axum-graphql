@@ -1,0 +1,17 @@
+version: "3"
+services:
+  mysql:
+    platform: linux/x86_64
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: db
+    ports:
+      - 3306:3306
+    command: mysqld --innodb_use_native_aio=0
+    volumes:
+      - mysql-volume:/var/lib/mysql
+volumes:
+  mysql-volume:

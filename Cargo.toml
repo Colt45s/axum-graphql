@@ -1,0 +1,20 @@
+[package]
+name = "axum-graphql"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+axum = { version = "0.6.1", features = ["macros"] }
+async-graphql = { version = "5.0.4", features = ["chrono", "dataloader"]}
+async-graphql-axum = "5.0.4"
+serde = "1.0.151"
+serde_json = "1.0.90"
+tokio = { version = "1.23.0", features = ["full"] }
+sea-orm = { version = "0.10.6", features = [ "sqlx-mysql", "runtime-async-std-native-tls", "macros", "debug-print"  ] }
+chrono = "0.4.23"
+dotenvy = "0.15.6"
+tracing = "0.1.37"
+tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
+itertools = "0.10.5"
