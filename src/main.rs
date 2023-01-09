@@ -4,7 +4,7 @@ mod schema;
 
 use std::{env, sync::Arc, time::Duration};
 
-use async_graphql::{dataloader::DataLoader, EmptyMutation, EmptySubscription};
+use async_graphql::{dataloader::DataLoader, EmptySubscription};
 use axum::{
     routing::{get, post},
     Router,
@@ -14,7 +14,7 @@ use sea_orm::{ConnectOptions, Database};
 
 use crate::{
     handlers::{graphql_handler, graphql_playground},
-    schema::Query,
+    schema::{Mutation, Query},
 };
 
 use crate::schema::post::loader::PostLoader;
@@ -48,7 +48,7 @@ async fn main() {
     let post_loader = DataLoader::new(PostLoader::new(conn.clone()), tokio::spawn);
 
     let schema = Arc::new(
-        Schema::build(Query::default(), EmptyMutation, EmptySubscription)
+        Schema::build(Query::default(), Mutation::default(), EmptySubscription)
             .data(conn)
             .data(post_loader)
             .limit_complexity(5000)
