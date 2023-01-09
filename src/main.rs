@@ -1,3 +1,4 @@
+mod entities;
 mod handlers;
 mod schema;
 
