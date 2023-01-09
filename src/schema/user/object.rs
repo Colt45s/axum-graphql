@@ -5,7 +5,6 @@ use itertools::Itertools;
 use crate::entities::user::Model;
 use crate::schema::post::loader;
 use crate::schema::post::object::Post;
-// use crate::schema::post::model as post_model;
 
 pub struct User {
     pub model: Model,

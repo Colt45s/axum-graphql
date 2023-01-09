@@ -1,5 +1,3 @@
-// use super::model::Entity as UserEntity;
-// use super::model::Model as UserModel;
 use super::object::User;
 use crate::entities::user;
 use async_graphql::{Context, FieldError, FieldResult, Object};
