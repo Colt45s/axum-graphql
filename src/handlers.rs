@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::{
@@ -10,7 +8,7 @@ use axum::{
 use crate::AppState;
 
 pub async fn graphql_handler(
-    State(state): State<Arc<AppState>>,
+    State(state): State<AppState>,
     req: GraphQLRequest,
 ) -> GraphQLResponse {
     state.schema.execute(req.into_inner()).await.into()

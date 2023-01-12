@@ -2,7 +2,7 @@ mod entities;
 mod handlers;
 mod schema;
 
-use std::{env, sync::Arc, time::Duration};
+use std::{env, time::Duration};
 
 use async_graphql::{dataloader::DataLoader, EmptySubscription};
 use axum::{
@@ -19,8 +19,9 @@ use crate::{
 
 use crate::schema::post::loader::PostLoader;
 
+#[derive(Clone)]
 pub struct AppState {
-    pub schema: Arc<Schema>,
+    pub schema: Schema,
 }
 
 #[tokio::main]
@@ -47,16 +48,14 @@ async fn main() {
 
     let post_loader = DataLoader::new(PostLoader::new(conn.clone()), tokio::spawn);
 
-    let schema = Arc::new(
-        Schema::build(Query::default(), Mutation::default(), EmptySubscription)
-            .data(conn)
-            .data(post_loader)
-            .limit_complexity(5000)
-            // .limit_depth(5)
-            .finish(),
-    );
+    let schema = Schema::build(Query::default(), Mutation::default(), EmptySubscription)
+        .data(conn)
+        .data(post_loader)
+        .limit_complexity(5000)
+        // .limit_depth(5)
+        .finish();
 
-    let state = Arc::new(AppState { schema });
+    let state = AppState { schema };
     let app = Router::new()
         .route("/graphql", post(graphql_handler))
         .route("/graphiql", get(graphql_playground))
