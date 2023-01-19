@@ -2,22 +2,21 @@ mod entities;
 mod handlers;
 mod schema;
 
-use std::{env, time::Duration};
-
-use async_graphql::{dataloader::DataLoader, EmptySubscription};
-use axum::{
-    routing::{get, post},
-    Router,
-};
-use schema::Schema;
-use sea_orm::{ConnectOptions, Database};
-
+use crate::schema::post::loader::PostLoader;
 use crate::{
     handlers::{graphql_handler, graphql_playground},
     schema::{Mutation, Query},
 };
-
-use crate::schema::post::loader::PostLoader;
+use async_graphql::{dataloader::DataLoader, extensions::OpenTelemetry, EmptySubscription};
+use axum::{
+    routing::{get, post},
+    Router,
+};
+use opentelemetry::{sdk::trace::TracerProvider, trace::TracerProvider as _};
+use opentelemetry_stackdriver::{StackDriverExporter, YupAuthorizer};
+use schema::Schema;
+use sea_orm::{ConnectOptions, Database};
+use std::{env, path::PathBuf, time::Duration};
 
 #[derive(Clone)]
 pub struct AppState {
@@ -26,10 +25,26 @@ pub struct AppState {
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::DEBUG)
-        .with_test_writer()
-        .init();
+    let authorizer = YupAuthorizer::new(
+        PathBuf::from("service-account.json"),
+        PathBuf::from("tokens.json"),
+    )
+    .await
+    .unwrap();
+
+    let (exporter, driver) = StackDriverExporter::builder()
+        .build(authorizer)
+        .await
+        .unwrap();
+
+    tokio::spawn(driver);
+
+    let provider = TracerProvider::builder()
+        .with_simple_exporter(exporter)
+        .build();
+    let tracer = provider.tracer("tracing");
+
+    let opentelemetry_extension = OpenTelemetry::new(tracer);
     dotenvy::dotenv().ok();
 
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
@@ -52,6 +67,7 @@ async fn main() {
         .data(conn)
         .data(post_loader)
         .limit_complexity(5000)
+        .extension(opentelemetry_extension)
         // .limit_depth(5)
         .finish();
 
