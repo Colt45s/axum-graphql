@@ -14,7 +14,3 @@ Cargo.lock
 *.pdb
 
 .env
-
-service-account.json
-
-tokens.json
