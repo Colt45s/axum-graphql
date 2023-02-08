@@ -14,10 +14,7 @@ impl UserQuery {
         let conn = context.data::<DatabaseConnection>().unwrap();
 
         match user::Entity::find().all(conn).await {
-            Ok(users) => Ok(users
-                .into_iter()
-                .map(|user| User { model: user })
-                .collect_vec()),
+            Ok(users) => Ok(users.into_iter().map(|user| user.into()).collect_vec()),
             Err(e) => Err(FieldError::new(format!("{}", e))),
         }
     }
@@ -26,7 +23,7 @@ impl UserQuery {
         let conn = context.data::<DatabaseConnection>().unwrap();
 
         match user::Entity::find_by_id(user_id).one(conn).await {
-            Ok(Some(user)) => Ok(User { model: user }),
+            Ok(Some(user)) => Ok(user.into()),
             Ok(None) => Err(FieldError::new("Not Found")),
             Err(e) => Err(FieldError::new(format!("{}", e))),
         }

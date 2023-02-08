@@ -28,7 +28,7 @@ impl PostMutation {
         };
 
         match post.insert(conn).await {
-            Ok(post) => Ok(Post { model: post }),
+            Ok(post) => Ok(post.into()),
             Err(e) => Err(FieldError::new(format!("{}", e))),
         }
     }
