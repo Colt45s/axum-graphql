@@ -4,7 +4,7 @@ mod schema;
 
 use std::{env, time::Duration};
 
-use async_graphql::{dataloader::DataLoader, EmptySubscription};
+use async_graphql::{dataloader::DataLoader, extensions::ApolloTracing, EmptySubscription};
 use axum::{
     routing::{get, post},
     Router,
@@ -53,6 +53,7 @@ async fn main() {
         .data(post_loader)
         .limit_complexity(5000)
         // .limit_depth(5)
+        .extension(ApolloTracing)
         .finish();
 
     let state = AppState { schema };
